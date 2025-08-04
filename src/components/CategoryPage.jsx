@@ -13,7 +13,7 @@ import NextImage from "../assets/Next.svg";
 
 import { useNavigate } from "react-router-dom";
 
-function CategoryPage() {
+export  function CategoryPage() {
   const navigate = useNavigate();
 
   // Navigate to books by selected genre
@@ -145,4 +145,4 @@ function CategoryPage() {
   );
 }
 
-export default CategoryPage;
+
