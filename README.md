@@ -2,7 +2,7 @@
 
 Modern book browsing app built with React + Material UI. Search and explore thousands of classic books from Project Gutenberg.
 
-**[🌐 Live Demo](https://gauravv01.github.io/bookvault-digital)**
+**[🌐 Live Demo](https://github.io/gauravv01/bookvault-digital)**
 
 ## Features
 - 🔍 Real-time search
