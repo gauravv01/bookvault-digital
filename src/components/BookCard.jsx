@@ -1,85 +1,84 @@
-import React from 'react';
+import React from "react";
+import Card from "@mui/material/Card";
+import CardMedia from "@mui/material/CardMedia";
+import Typography from "@mui/material/Typography";
+import CardActionArea from "@mui/material/CardActionArea";
+import Box from "@mui/material/Box";
 
-const BookCard = ({ book, onBookClick }) => {
+// BookCard displays a single book's image, title, and author.
+// On click, it opens the book in a prioritized readable format.
+function BookCard({ title, author, image, book }) {
   const handleClick = () => {
-    onBookClick(book);
-  };
+    const { formats } = book;
 
-  const getCoverImage = (book) => {
-    const formats = book.formats || {};
-    
-    // Look for cover images in the formats
-    const coverKeys = Object.keys(formats).filter(key => 
-      key.includes('image') || 
-      formats[key].includes('.jpg') || 
-      formats[key].includes('.png') || 
-      formats[key].includes('.gif') ||
-      formats[key].includes('cover') ||
-      key.includes('cover')
-    );
-    
-    if (coverKeys.length > 0) {
-      return formats[coverKeys[0]];
+    // Define preferred formats in priority order
+    const priorityFormats = [
+      "text/html; charset=utf-8",
+      "text/html",
+      "application/pdf",
+      "text/plain; charset=utf-8",
+      "text/plain",
+    ];
+    let bookUrl = null;
+
+    // Look for the first available readable format that isn't a .zip file
+    for (const format of priorityFormats) {
+      if (formats[format] && !formats[format].endsWith(".zip")) {
+        bookUrl = formats[format];
+        break;
+      }
     }
-    
-    // Try to construct cover URL from Project Gutenberg ID
-    if (book.id) {
-      // Project Gutenberg cover image pattern
-      const gutenbergCover = `https://www.gutenberg.org/cache/epub/${book.id}/pg${book.id}.cover.medium.jpg`;
-      return gutenbergCover;
+
+    // Open the book in a new tab if a suitable format is found
+    if (bookUrl) {
+      window.open(bookUrl, "_blank");
+    } else {
+      alert("No viewable version available for this book.");
     }
-    
-    // Fallback to a styled placeholder
-    return `https://via.placeholder.com/114x162/F0F0F6/666666?text=${encodeURIComponent(book.title?.substring(0, 10) || 'Book')}`;
   };
-
-  const truncateText = (text, maxLength) => {
-    if (!text || text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  };
-
-  const getAuthorName = () => {
-    if (!book.authors || book.authors.length === 0) {
-      return 'Unknown Author';
-    }
-    return book.authors[0].name;
-  };
-
   return (
-    <div 
+    <Box
       onClick={handleClick}
-      className="bg-white rounded-lg shadow-card cursor-pointer 
-                 hover:shadow-lg transition-shadow duration-200
-                 w-full max-w-[114px] mx-auto"
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      {/* Book Cover Image */}
-      <div className="aspect-[114/162] relative overflow-hidden rounded-t-lg bg-grey-light">
-        <img
-          src={getCoverImage(book)}
-          alt={book.title}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.target.src = `https://via.placeholder.com/114x162/F0F0F6/666666?text=No+Cover`;
-          }}
-        />
-      </div>
-      
-      {/* Book Info */}
-      <div className="p-2">
-        <h3 className="font-montserrat font-normal text-book-name text-grey-dark 
-                       leading-tight mb-1 min-h-[2.5em] flex items-start">
-          <span className="line-clamp-2">
-            {truncateText(book.title, 40)}
-          </span>
-        </h3>
-        
-        <p className="font-montserrat font-normal text-book-author text-grey-medium 
-                      leading-tight truncate">
-          {truncateText(getAuthorName(), 25)}
-        </p>
-      </div>
-    </div>
+      {/* Book Cover */}
+      <Card sx={{ width: "100%" }}>
+        <CardActionArea>
+          <CardMedia component="img" height="160" image={image} alt={title} />
+        </CardActionArea>
+      </Card>
+
+      {/* Book Title */}
+      <Typography
+        variant="body2"
+        sx={{
+          mt: 1,
+          fontWeight: 600,
+          textAlign: "center",
+          whiteSpace: "normal",
+          overflow: "visible",
+          textOverflow: "initial",
+          textTransform: "uppercase",
+        }}
+      >
+        {title}
+      </Typography>
+
+      {/* Book Author */}
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          textAlign: "center",
+          whiteSpace: "normal",
+          overflow: "visible",
+          textOverflow: "initial",
+        }}
+      >
+        {author}
+      </Typography>
+    </Box>
   );
-};
+}
 
 export default BookCard;

@@ -1,18 +1,14 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Books from './pages/Books';
+import { Route, Router, Routes } from "react-router-dom";
+import CategoryPage from "./Components/CategoryPage";
+import BookListPage from "./Components/BookListPage";
+import './App.css';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/books/:topic" element={<Books />} />
-        </Routes>
-      </div>
-    </Router>
+    <Routes>
+      <Route path="/" element={<CategoryPage />} />
+      <Route path="/books/:genre" element={<BookListPage />} />
+    </Routes>
   );
 }
 

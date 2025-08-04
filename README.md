@@ -1,12 +1,51 @@
-# React + Vite
+# 📚 GutenbergProject
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+GutenbergProject is a fast and responsive book browsing application built with **React + Vite**, allowing users to explore and search books by genre using the [Gutenberg Project API]. It features infinite scrolling, responsive UI with Material UI, and intuitive navigation.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## Expanding the ESLint configuration
+- ⚡️ Built with **Vite** for ultra-fast performance
+- 🎨 Clean and responsive UI using **Material UI (MUI)**
+- 🔍 Real-time **search** functionality with debounce
+- 📚 Browse books by **genre**
+- 🔄 **Infinite scroll** for seamless book loading
+- ❌ Handles errors gracefully with retry options
+- 🔙 Easy navigation with **React Router**
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🛠 Tech Stack
+
+- [React](https://reactjs.org/)
+- [Vite](https://vitejs.dev/)
+- [Material UI](https://mui.com/)
+- [React Router](https://reactrouter.com/)
+- [Gutendex API](https://gutendex.com/)
+- [ESLint](https://eslint.org/)
+
+------------------------------------------------------------------------------------------------------------------
+
+🚀 Setup This Project
+Follow the steps below to get the project up and running locally:
+
+###Clone the Repository
+
+git clone https://github.com/your-username/GutenbergProject.git
+
+#Install Dependencies : 
+npm install
+
+##Run App :
+npm run dev
+The app will be available at http://localhost:5173 by default.
+
+
+
+
+
+
+
+
+
