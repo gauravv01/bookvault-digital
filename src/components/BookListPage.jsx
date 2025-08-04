@@ -15,7 +15,7 @@ import { fetchBooks } from "../Services/bookService";
 import BookCard from "./BookCard";
 import CircularProgress from "@mui/material/CircularProgress";
 
-export  function BookListPage() {
+function BookListPage() {
   const navigate = useNavigate();
   const { genre } = useParams(); // Get genre from URL
   const [searchTerm, setSearchTerm] = useState(""); // Search input
@@ -188,4 +188,4 @@ export  function BookListPage() {
   );
 }
 
-
+export default BookListPage;
