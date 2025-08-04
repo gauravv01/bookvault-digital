@@ -20,11 +20,25 @@ export const searchBooks = async (topic = '', searchQuery = '', nextPageUrl = nu
   try {
     // If we have a next page URL, use it directly
     if (nextPageUrl) {
-      const response = await axios.get(nextPageUrl);
+      // Clean and secure the URL
+      let secureUrl = nextPageUrl.replace('http://', 'https://');
+      
+      // Handle potential malformed URLs
+      try {
+        new URL(secureUrl); // Validate URL
+      } catch (urlError) {
+        console.warn('Invalid pagination URL:', secureUrl);
+        throw new Error('Invalid pagination URL');
+      }
+      
+      const response = await axios.get(secureUrl, {
+        timeout: 5000, // Shorter timeout for pagination
+        validateStatus: (status) => status === 200 // Only accept 200 status
+      });
       return response.data;
     }
 
-    // Build search parameters according to Gutendex API documentation
+    // Build search parameters according to Gutendx API documentation
     const params = {};
 
     // Add topic search (searches in bookshelves and subjects)
@@ -37,28 +51,24 @@ export const searchBooks = async (topic = '', searchQuery = '', nextPageUrl = nu
       params.search = searchQuery;
     }
 
-    // Note: According to the documentation, books with covers would need
-    // to be filtered on the frontend since there's no direct way to filter
-    // for books with images via the API parameters
-
     const response = await api.get('/books', { params });
     
-    // Filter books to only include those with potential cover images
-    const filteredResults = response.data.results.filter(book => {
-      const formats = book.formats || {};
-      // Look for any format that might contain an image
-      return Object.keys(formats).some(key => 
-        key.includes('image') || 
-        formats[key].includes('.jpg') || 
-        formats[key].includes('.png') || 
-        formats[key].includes('.gif') ||
-        formats[key].includes('cover')
-      );
-    });
-
+    // Validate and clean pagination URLs
+    const cleanUrl = (url) => {
+      if (!url) return null;
+      try {
+        const cleanedUrl = url.replace('http://', 'https://');
+        new URL(cleanedUrl); // Validate
+        return cleanedUrl;
+      } catch {
+        return null; // Return null for invalid URLs
+      }
+    };
+    
     return {
       ...response.data,
-      results: filteredResults
+      next: cleanUrl(response.data.next),
+      previous: cleanUrl(response.data.previous)
     };
 
   } catch (error) {

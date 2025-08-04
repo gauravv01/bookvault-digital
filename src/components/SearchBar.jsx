@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 
 const SearchBar = ({ onSearch, placeholder = "Search", value = "" }) => {
   const [searchValue, setSearchValue] = useState(value);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchValue !== value) {
+        onSearch(searchValue);
+      }
+    }, 800); // Increased debounce time to reduce API calls
+
+    return () => clearTimeout(timeoutId);
+  }, [searchValue, onSearch, value]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,14 +26,7 @@ const SearchBar = ({ onSearch, placeholder = "Search", value = "" }) => {
   };
 
   const handleChange = (e) => {
-    const newValue = e.target.value;
-    setSearchValue(newValue);
-    // Auto-search as user types (debounced)
-    const timeoutId = setTimeout(() => {
-      onSearch(newValue);
-    }, 500);
-    
-    return () => clearTimeout(timeoutId);
+    setSearchValue(e.target.value);
   };
 
   return (

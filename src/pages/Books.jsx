@@ -22,25 +22,34 @@ const Books = () => {
 
   const loadBooks = useCallback(async (query = '', reset = false) => {
     setLoading(true);
-    setError(null);
     
     try {
       if (reset || !nextPage) {
-        // First page or reset
+        // First page or reset - clear any previous errors
+        setError(null);
         const data = await searchBooks(topic, query);
         setBooks(data.results || []);
         setNextPage(data.next);
         setHasMore(!!data.next);
       } else {
-        // Load next page using the full URL
-        const data = await searchBooks('', '', nextPage);
-        setBooks(prev => [...prev, ...(data.results || [])]);
-        setNextPage(data.next);
-        setHasMore(!!data.next);
+        // Load next page - don't show errors for pagination failures
+        try {
+          const data = await searchBooks('', '', nextPage);
+          setBooks(prev => [...prev, ...(data.results || [])]);
+          setNextPage(data.next);
+          setHasMore(!!data.next);
+        } catch (paginationError) {
+          console.warn('Pagination failed, stopping infinite scroll:', paginationError);
+          setHasMore(false); // Stop trying to load more pages
+          // Don't set error state for pagination failures
+        }
       }
     } catch (err) {
       console.error('Error loading books:', err);
-      setError('Failed to load books. Please try again.');
+      if (reset) {
+        // Only show error for initial load failures
+        setError('Failed to load books. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -58,21 +67,40 @@ const Books = () => {
     loadBooks(query, true);
   };
 
-  // Handle scroll for infinite loading
+  // Handle scroll for infinite loading with improved logic
   useEffect(() => {
     const handleScroll = () => {
+      // More conservative scroll detection
+      const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
+      const pageHeight = document.documentElement.offsetHeight;
+      const scrollThreshold = pageHeight - 800; // Start loading when 800px from bottom
+      
       if (
-        window.innerHeight + document.documentElement.scrollTop
-        >= document.documentElement.offsetHeight - 1000
-        && hasMore && !loading
+        scrollPosition >= scrollThreshold &&
+        hasMore && 
+        !loading &&
+        nextPage // Only try if we have a valid next page URL
       ) {
         loadBooks(searchQuery);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loadBooks, searchQuery, hasMore, loading]);
+    // Throttle scroll events
+    let timeoutId;
+    const throttledScroll = () => {
+      if (timeoutId) return;
+      timeoutId = setTimeout(() => {
+        handleScroll();
+        timeoutId = null;
+      }, 200);
+    };
+
+    window.addEventListener('scroll', throttledScroll);
+    return () => {
+      window.removeEventListener('scroll', throttledScroll);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [loadBooks, searchQuery, hasMore, loading, nextPage]);
 
   // Handle book click
   const handleBookClick = (book) => {
@@ -159,10 +187,18 @@ const Books = () => {
           />
         </div>
 
-        {/* Error Message */}
+        {/* Error Message with Retry Button */}
         {error && (
-          <div className="text-center text-red-500 mb-6 text-sm">
-            {error}
+          <div className="text-center mb-6">
+            <p className="text-red-500 text-sm mb-3">{error}</p>
+            <button
+              onClick={() => loadBooks(searchQuery, true)}
+              className="bg-primary text-white px-4 py-2 rounded text-sm
+                         hover:bg-primary/80 transition-colors"
+              disabled={loading}
+            >
+              {loading ? 'Retrying...' : 'Retry'}
+            </button>
           </div>
         )}
 
@@ -185,9 +221,9 @@ const Books = () => {
         )}
 
         {/* No More Books Message */}
-        {!hasMore && books.length > 0 && (
+        {!hasMore && books.length > 0 && !loading && (
           <div className="text-center text-grey-medium py-8 text-sm">
-            No more books to load
+            {nextPage ? 'Unable to load more books' : 'No more books to load'}
           </div>
         )}
 

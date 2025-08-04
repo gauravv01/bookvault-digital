@@ -19,7 +19,7 @@ const Home = () => {
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
           <h1 className="font-montserrat font-semibold text-4xl md:text-heading-1 
-                         text-primary mb-6 leading-tight">
+                         text-primary mb-6 leading-tight text-primary">
             Gutenberg Project
           </h1>
           <p className="font-montserrat font-normal text-body text-grey-dark 
